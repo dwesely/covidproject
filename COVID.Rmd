@@ -2,9 +2,9 @@
 title: "Reproducible Report on COVID19 Data"
 author: "Dan Wesely"
 output:
-  html_document: default
   pdf_document: default
-date: "2025-02-22"
+  html_document: default
+date: "2025-03-04"
 ---
 
 ```{r setup, include=FALSE}
@@ -128,7 +128,21 @@ us_tot_w_pred %>% ggplot() + geom_point(aes(x = cases_per_thou, y = deaths_per_t
 
 ## Bias
 
-Differences in reporting processes and infrastructure in the different states could have caused case and death rates to be skewed. Different state resources may have resulted in more or less accurate identification of COVID as well, which could again affect rates.
+Differences in reporting processes and infrastructure in the different states could have caused case and death rates to be skewed. Different state resources may have resulted in more or less accurate identification of COVID as well, which could again affect rates. One proxy for the amount of resources in a state might be the population of that state.
+
+
+```{r modelbypop}
+mod <- lm(deaths_per_thou ~ population, data = us_state_totals)
+summary(mod)
+us_tot_w_pred <- us_state_totals %>% mutate(pred = predict(mod))
+us_tot_w_pred %>% ggplot() + geom_point(aes(x = population, y = deaths_per_thou), color = "blue") + geom_point(aes(x = population, y = pred), color = "red")
+```
+
+## Conclusion
+
+A linear model of death rate based on total population is not particularly reasonable. Population does not appear to be linearly related to the death rate. Very high population states appear to have relatively low death rates compared to moderately-sized states. Lower population states appear to have greatly varying death rates.
+
+The same bias could apply here: differences in identification and recording of the cases and deaths may be affecting the perceived rates.
 
 
 ```{r}
